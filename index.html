@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hakatha Maldives — Employee Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0a6b3a;
+    --green-dark:#074f2b;
+    --yellow:#f2e51e;
+    --ink:#12241a;
+    --muted:#7c8a80;
+    --line:#e7ebe6;
+    --card-bg:#ffffff;
+    --page-bg:#eef1ee;
+    --row-bg:#f6f8f5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+
+  .wrap{display:flex;justify-content:center;min-height:100vh;padding:32px 16px;}
+  .card{width:100%;max-width:440px;background:var(--card-bg);border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(10,60,35,0.18);height:fit-content;}
+
+  .brand{padding:28px 24px 16px;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .brand-mark{width:38px;height:38px;border-radius:11px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .brand-mark span{font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--yellow);font-size:19px;}
+  .brand-name{font-family:'Space Grotesk',sans-serif;line-height:1.15;}
+  .brand-name b{display:block;font-weight:800;font-size:19px;color:var(--green);letter-spacing:0.2px;}
+  .brand-name small{display:block;font-weight:500;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-top:1px;}
+
+  .divider{height:4px;background:var(--green);margin-top:8px;}
+
+  .id-block{padding:0 24px 4px;text-align:center;}
+  .avatar{width:104px;height:104px;border-radius:50%;margin:-52px auto 0;background:var(--green);display:flex;align-items:center;justify-content:center;border:3px solid var(--card-bg);box-shadow:0 6px 18px rgba(0,0,0,0.15);overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;}
+  .avatar span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:32px;color:#fff;}
+  .full-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;color:var(--ink);margin-top:14px;}
+  .role{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;letter-spacing:1.5px;color:var(--green);text-transform:uppercase;margin-top:4px;}
+
+  .info-grid{padding:20px 24px 4px;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;}
+  .info-cell{padding:12px 10px;border-radius:12px;}
+  .info-label{font-size:10.5px;letter-spacing:1.3px;color:var(--muted);text-transform:uppercase;font-weight:600;}
+  .info-value{font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--ink);margin-top:4px;}
+
+  .doc-cell{cursor:pointer;background:var(--row-bg);border:1px solid transparent;transition:background .15s ease, transform .1s ease;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .doc-cell:hover{background:#eef4ee;}
+  .doc-cell:active{transform:scale(0.98);}
+  .doc-cell .doc-text{min-width:0;}
+  .doc-cell .doc-value{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .doc-icon{width:18px;height:18px;flex-shrink:0;color:var(--green);opacity:.75;}
+
+  .section-sep{margin:22px 24px 0;height:1px;background:var(--line);}
+
+  .section{padding:20px 24px 6px;}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--green);text-transform:uppercase;}
+
+  .vehicle-list{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .vehicle-row{display:flex;align-items:center;gap:12px;background:var(--row-bg);border-radius:12px;padding:12px 12px;cursor:pointer;transition:background .15s ease, transform .1s ease;}
+  .vehicle-row:hover{background:#eef4ee;}
+  .vehicle-row:active{transform:scale(0.98);}
+  .vehicle-plate{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ink);}
+  .vehicle-type{font-size:12px;color:var(--muted);margin-top:1px;}
+  .vehicle-icon{width:18px;height:18px;flex-shrink:0;color:var(--green);opacity:.75;}
+
+  .emergency{margin:24px 0 0;padding:26px 24px;background:var(--green);text-align:center;}
+  .emergency-label{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:2px;color:rgba(255,255,255,0.75);text-transform:uppercase;}
+  .emergency-btn{display:inline-block;margin-top:12px;background:var(--yellow);color:var(--green);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;padding:12px 22px;border-radius:100px;text-decoration:none;}
+
+  .footer-bar{display:flex;height:10px;}
+  .footer-bar div{flex:1;background:var(--green);}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(10,25,17,0.55);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s ease;z-index:50;}
+  .overlay.open{opacity:1;pointer-events:auto;}
+  .sheet{width:100%;max-width:440px;background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 28px;transform:translateY(24px);transition:transform .2s ease;max-height:82vh;overflow-y:auto;}
+  .overlay.open .sheet{transform:translateY(0);}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;}
+  .sheet-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
+  .sheet-close{width:30px;height:30px;border-radius:50%;background:var(--row-bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;}
+  .sheet-body{margin-top:16px;}
+  .doc-preview{width:100%;border-radius:12px;overflow:hidden;background:var(--row-bg);}
+  .doc-preview img{width:100%;display:block;}
+  .doc-preview iframe{width:100%;height:60vh;border:0;display:block;}
+  .empty-state{padding:36px 16px;text-align:center;color:var(--muted);}
+  .empty-state svg{width:34px;height:34px;color:var(--muted);opacity:.6;margin-bottom:10px;}
+  .empty-state p{font-size:13.5px;line-height:1.5;margin:0;}
+  .sheet-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="brand">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgaWQ9IkxheWVyXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyOTQuMzUgMzk3Ljk3Ij4KCjxnPjxnPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0yNTguNTIsMTQ4Ljg3Yy0uNjItMS40LTEuMjMtMi44LTEuOTEtNC4xMi0uMDUtLjE0LS4xNy0uMzEtLjItLjQxLTMuODktNy45My04LjU0LTE1LjQxLTEzLjg0LTIyLjM5LS4xOS0uMTQtLjI1LS4zMS0uMzYtLjQ4QzE3Ny4xLDM1LjQ4LDE3My43OSwzMC44MiwxNjksMGMwLDAtODEuMjgsNDcuODktMTMxLjEsMTEwLjA2LTE2LjEyLDE2LjctMjcuOTEsMzcuNC0zMy44LDYwLjU4QzEuMzEsMTgwLjI1LS4yLDE4OS45NS4wMiwxOTkuNjNoLjA1YzAsMS40LS4wNSwyLjgxLS4wNSw0LjJDLjAyLDI3OC40Myw2MC40NiwzMzguOTUsMTM1LjA3LDMzOC45NXMxMzUuMTYtNjAuNTIsMTM1LjE2LTEzNS4xMWMwLDAsMi4xMy0yNC40My0xMS43MS01NC45N1oiPjwvcGF0aD48cGF0aCBmaWxsPSIjZjJlNTFlIiBkPSJNMTcxLjQ5LDk1LjYzdjczLjQ5aC03MS44NHYtNzMuODZjLTQ2LjE4LDE0LjktNzkuNTIsNTguMjUtNzkuNTIsMTA5LjQxczMzLjM0LDk0LjQ4LDc5LjUyLDEwOS40MnYtNzMuMTZoNzEuODR2NzIuODVjNDUuNjctMTUuMjUsNzguNjUtNTguMyw3OC42NS0xMDkuMTFzLTMyLjk4LTkzLjg5LTc4LjY1LTEwOS4wNFoiPjwvcGF0aD48L2c+CjxnPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik05MTMuNDcsMzQzLjgxYzQuMjIsMy41Miw2LjMzLDguNCw2LjMzLDE0LjY1cy0yLjExLDExLjA1LTYuMzMsMTQuNTdjLTQuMjIsMy41Mi0xMC4wNSw1LjI4LTE3LjQ4LDUuMjhoLTE2Ljg5djE5LjM0aC00LjMxdi01OS4xaDIxLjE5YzcuNDMsMCwxMy4yNiwxLjc2LDE3LjQ4LDUuMjhaTTkxMC40MywzNzAuMjhjMy4zMi0yLjc2LDQuOTgtNi43LDQuOTgtMTEuODJzLTEuNjYtOS4wOC00Ljk4LTExLjg2Yy0zLjMyLTIuNzktOC4xMy00LjE4LTE0LjQ0LTQuMThoLTE2Ljg5djMyaDE2Ljg5YzYuMywwLDExLjEyLTEuMzgsMTQuNDQtNC4xNFoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNOTg4LjI4LDMzOC41M2wtMjYuMzQsNTkuMWgtNC4zMWwtMjYuMzQtNTkuMWg0LjczbDIzLjksNTMuNTMsMjMuODktNTMuNTNoNC40OFoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNMTAxNy40MSwzNDIuNDJoLTIxLjI4di0zLjg4aDQ2Ljg2djMuODhoLTIxLjI4djU1LjIyaC00LjMxdi01NS4yMloiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNMTA1My45MiwzOTYuOTJjLS43LS43LTEuMDYtMS41Ni0xLjA2LTIuNThzLjM1LTEuODYsMS4wNi0yLjUzYy43LS42NywxLjUzLTEuMDEsMi40OS0xLjAxczEuNzkuMzQsMi40OSwxLjAxYy43LjY4LDEuMDYsMS41MiwxLjA2LDIuNTNzLS4zNSwxLjg3LTEuMDYsMi41OGMtLjcxLjctMS41MywxLjA2LTIuNDksMS4wNnMtMS43OS0uMzUtMi40OS0xLjA2WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMTExLjM4LDMzOC41M2g0LjMxdjU1LjIyaDM0LjAzdjMuODhoLTM4LjMzdi01OS4xWiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMTczLjg2LDM0Mi40MmgtMjEuMjh2LTMuODhoNDYuODZ2My44OGgtMjEuMjh2NTUuMjJoLTQuMzF2LTU1LjIyWiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMjE3LjM1LDMzOC41M2gyMy4zOWM2LjEzLDAsMTEuNTgsMS4yNywxNi4zNCwzLjgsNC43NiwyLjUzLDguNDYsNi4wNCwxMS4xLDEwLjUxLDIuNjUsNC40OCwzLjk3LDkuNTYsMy45NywxNS4yNHMtMS4zMiwxMC43Ny0zLjk3LDE1LjI0Yy0yLjY1LDQuNDgtNi4zNSw3Ljk4LTExLjEsMTAuNTEtNC43NiwyLjUzLTEwLjIsMy44LTE2LjM0LDMuOGgtMjMuMzl2LTU5LjFaTTEyNDAuNCwzOTMuNzVjNS40NiwwLDEwLjI3LTEuMDgsMTQuNDQtMy4yNSw0LjE3LTIuMTcsNy4zNy01LjE5LDkuNjMtOS4wOCwyLjI1LTMuODgsMy4zOC04LjMzLDMuMzgtMTMuMzRzLTEuMTMtOS40Ni0zLjM4LTEzLjM0Yy0yLjI1LTMuODgtNS40Ni02LjkxLTkuNjMtOS4wOC00LjE3LTIuMTctOC45OC0zLjI1LTE0LjQ0LTMuMjVoLTE4Ljc0djUxLjM0aDE4Ljc0WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMjg4LjMxLDM5Ni45MmMtLjctLjctMS4wNi0xLjU2LTEuMDYtMi41OHMuMzUtMS44NiwxLjA2LTIuNTNjLjctLjY3LDEuNTMtMS4wMSwyLjQ5LTEuMDFzMS43OS4zNCwyLjQ5LDEuMDFjLjcuNjgsMS4wNiwxLjUyLDEuMDYsMi41M3MtLjM1LDEuODctMS4wNiwyLjU4Yy0uNzEuNy0xLjUzLDEuMDYtMi40OSwxLjA2cy0xLjc5LS4zNS0yLjQ5LTEuMDZaIj48L3BhdGg+PC9nPgo8Zz48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNNDQzLjI1LDUwLjkzdjExNy42NmgtMzMuMjh2LTQ1Ljg5aC00NS4zOXY0NS44OWgtMzMuMjhWNTAuOTNoMzMuMjh2NDQuMjFoNDUuMzl2LTQ0LjIxaDMzLjI4WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik01NTYuNTUsMTQ1LjczaC00OS43NmwtOS4yNSwyMi44NmgtMzMuOTVsNTEuOTQtMTE3LjY2aDMyLjc4bDUyLjExLDExNy42NmgtMzQuNjNsLTkuMjQtMjIuODZaTTU0Ni44LDEyMS4xOWwtMTUuMTMtMzcuNjUtMTUuMTMsMzcuNjVoMzAuMjZaIj48L3BhdGg+PHBhdGggZmlsbD0iIzBhNmIzYSIgZD0iTTY2Ni4xNCwxMjUuODlsLTEyLjQ0LDEzLjI4djI5LjQyaC0zMi45NVY1MC45M2gzMi45NXY0OC45MWw0NS41NS00OC45MWgzNi42NGwtNDguMDcsNTIuMTEsNTAuNiw2NS41NmgtMzguNjZsLTMzLjYyLTQyLjdaIj48L3BhdGg+PHBhdGggZmlsbD0iIzBhNmIzYSIgZD0iTTgzMS4zOCwxNDUuNzNoLTQ5Ljc2bC05LjI0LDIyLjg2aC0zMy45Nmw1MS45NC0xMTcuNjZoMzIuNzhsNTIuMTEsMTE3LjY2aC0zNC42M2wtOS4yNS0yMi44NlpNODIxLjYzLDEyMS4xOWwtMTUuMTMtMzcuNjUtMTUuMTMsMzcuNjVoMzAuMjZaIj48L3BhdGg+PHBhdGggZmlsbD0iIzBhNmIzYSIgZD0iTTkxNC43Niw3Ny4zMWgtMzYuMTR2LTI2LjM5aDEwNS4zOXYyNi4zOWgtMzUuOTd2OTEuMjdoLTMzLjI4di05MS4yN1oiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNMTExOS4zMiw1MC45M3YxMTcuNjZoLTMzLjI4di00NS44OWgtNDUuMzl2NDUuODloLTMzLjI4VjUwLjkzaDMzLjI4djQ0LjIxaDQ1LjM5di00NC4yMWgzMy4yOFoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNMTIzMi42MiwxNDUuNzNoLTQ5Ljc2bC05LjI0LDIyLjg2aC0zMy45Nmw1MS45NC0xMTcuNjZoMzIuNzhsNTIuMTEsMTE3LjY2aC0zNC42M2wtOS4yNC0yMi44NlpNMTIyMi44NywxMjEuMTlsLTE1LjEzLTM3LjY1LTE1LjEzLDM3LjY1aDMwLjI2WiI+PC9wYXRoPgo8Zz48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNNDM3LjU0LDMxNC41NGwtLjM0LTYyLjM2LTMwLjI2LDUwLjc2aC0xNC43OWwtMzAuMDktNDkuMDh2NjAuNjhoLTMwLjc2di0xMTcuNjdoMjcuNGw0MS4zNSw2Ny45MSw0MC4zNC02Ny45MWgyNy40bC4zNCwxMTcuNjdoLTMwLjU5WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik01NzMuMTksMjkxLjY4aC00OS43NmwtOS4yNSwyMi44NmgtMzMuOTVsNTEuOTQtMTE3LjY3aDMyLjc4bDUyLjExLDExNy42N2gtMzQuNjNsLTkuMjQtMjIuODZaTTU2My40NCwyNjcuMTRsLTE1LjEzLTM3LjY1LTE1LjEzLDM3LjY1aDMwLjI2WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik02MjkuMTYsMTk2Ljg4aDMzLjI4djkxLjI3aDU2LjE0djI2LjM5aC04OS40M3YtMTE3LjY3WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik03MzQuMzksMTk2Ljg4aDU1LjY0YzEyLjg5LDAsMjQuMzIsMi40MSwzNC4yOSw3LjIzLDkuOTcsNC44MiwxNy43LDExLjY2LDIzLjIsMjAuNTEsNS40OSw4Ljg1LDguMjQsMTkuMjIsOC4yNCwzMS4xcy0yLjc1LDIyLjI1LTguMjQsMzEuMWMtNS40OSw4Ljg1LTEzLjIyLDE1LjY5LTIzLjIsMjAuNTEtOS45Nyw0LjgyLTIxLjQxLDcuMjMtMzQuMjksNy4yM2gtNTUuNjR2LTExNy42N1pNNzg4LjY4LDI4Ny45OGMxMC4wOSwwLDE4LjE4LTIuODYsMjQuMjktOC41Nyw2LjExLTUuNzIsOS4xNi0xMy42Miw5LjE2LTIzLjdzLTMuMDUtMTcuOTktOS4xNi0yMy43Yy02LjExLTUuNzEtMTQuMi04LjU3LTI0LjI5LTguNTdoLTIxLjAxdjY0LjU1aDIxLjAxWiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik04NzUuOTIsMTk2Ljg4aDMzLjI4djExNy42N2gtMzMuMjh2LTExNy42N1oiPjwvcGF0aD48cGF0aCBmaWxsPSIjMGE2YjNhIiBkPSJNMTA1NC42LDE5Ni44OGwtNTAuNDMsMTE3LjY3aC0zMi43OGwtNTAuMjYtMTE3LjY3aDM1Ljk3bDMxLjk0LDc2LjY1LDMyLjYxLTc2LjY1aDMyLjk1WiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMTU4LjY1LDI4OC44MnYyNS43MmgtOTQuNDd2LTExNy42N2g5Mi4yOHYyNS43MmgtNTkuMzR2MTkuODRoNTIuMjh2MjQuODhoLTUyLjI4djIxLjUyaDYxLjUyWiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwYTZiM2EiIGQ9Ik0xMTkzLjQ0LDMxMy4zNmMtOC45Ny0yLjM1LTE2LjI1LTUuNDktMjEuODUtOS40MWwxMC45My0yNC41NGM1LjI3LDMuNDcsMTEuMzcsNi4yOCwxOC4zMiw4LjQsNi45NSwyLjEzLDEzLjc4LDMuMTksMjAuNTEsMy4xOSwxMi43NywwLDE5LjE2LTMuMTksMTkuMTYtOS41OCwwLTMuMzYtMS44Mi01Ljg1LTUuNDYtNy40OC0zLjY0LTEuNjItOS41LTMuMzMtMTcuNTctNS4xMy04Ljg1LTEuOS0xNi4yNS0zLjk1LTIyLjE5LTYuMTQtNS45NC0yLjE5LTExLjA0LTUuNjktMTUuMy0xMC41MS00LjI2LTQuODItNi4zOS0xMS4zMi02LjM5LTE5LjUsMC03LjE3LDEuOTYtMTMuNjQsNS44OC0xOS40MSwzLjkyLTUuNzcsOS43Ny0xMC4zNCwxNy41Ny0xMy43LDcuNzktMy4zNiwxNy4zNC01LjA0LDI4LjY2LTUuMDQsNy43MywwLDE1LjM1Ljg3LDIyLjg2LDIuNjEsNy41MSwxLjc0LDE0LjEyLDQuMjksMTkuODQsNy42NWwtMTAuMjUsMjQuNzFjLTExLjIxLTYuMDUtMjIuMDgtOS4wOC0zMi42MS05LjA4LTYuNjEsMC0xMS40My45OC0xNC40NiwyLjk0LTMuMDIsMS45Ni00LjU0LDQuNTEtNC41NCw3LjY1czEuNzksNS40OSw1LjM4LDcuMDZjMy41OCwxLjU3LDkuMzYsMy4xOSwxNy4zMSw0Ljg3LDguOTYsMS45MSwxNi4zOSwzLjk1LDIyLjI3LDYuMTQsNS44OCwyLjE5LDEwLjk4LDUuNjYsMTUuMywxMC40Miw0LjMxLDQuNzYsNi40NywxMS4yNCw2LjQ3LDE5LjQxLDAsNy4wNi0xLjk2LDEzLjQ1LTUuODgsMTkuMTYtMy45Miw1LjcyLTkuODEsMTAuMjgtMTcuNjUsMTMuNy03Ljg1LDMuNDItMTcuMzcsNS4xMy0yOC41OCw1LjEzLTkuNTMsMC0xOC43Ny0xLjE4LTI3LjczLTMuNTNaIj48L3BhdGg+PC9nPgo8L2c+CjwvZz4KPC9zdmc+" alt="Hakatha Maldives Pvt. Ltd." style="width:100%;max-width:260px;height:auto;">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="id-block">
+      <div class="avatar" id="avatar"><span id="avatarInitials">MA</span></div>
+      <div class="full-name" id="fullName"></div>
+      <div class="role" id="role"></div>
+    </div>
+
+    <div class="info-grid" id="infoGrid"></div>
+
+    <div class="section-sep"></div>
+
+    <div class="section">
+      <div class="section-title">Vehicles</div>
+      <div class="vehicle-list" id="vehicleList"></div>
+    </div>
+
+    <div class="emergency">
+      <div class="emergency-label">In case of emergency, call</div>
+      <a class="emergency-btn" id="emergencyBtn" href="#"></a>
+    </div>
+
+    <div class="footer-bar"><div></div><div></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <div class="sheet-title" id="sheetTitle">Document</div>
+        <div class="sheet-sub" id="sheetSub"></div>
+      </div>
+      <button class="sheet-close" id="sheetClose" aria-label="Close">✕</button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   EDIT THIS SECTION PER EMPLOYEE
+   - Set fileUrl on any document/vehicle to a direct link to an
+     image (.jpg/.png) or PDF and it will open in the viewer.
+   - Leave fileUrl as null until the file is ready — the card
+     still works, it just shows "No document on file".
+   ============================================================ */
+
+/* ============================================================
+   CONNECT TO THE SPREADSHEET
+   1. Paste your deployed Apps Script Web App URL below.
+   2. Each employee's badge links to this SAME file, with a
+      different ?id=EMP0xx at the end of the URL, e.g.:
+      https://yoursite.com/profile.html?id=EMP018
+   No other part of this file needs to change per employee.
+   ============================================================ */
+
+const APPS_SCRIPT_URL = https://script.google.com/macros/s/AKfycbw6A2TBgcw9LuZuia44zTffwFybTSxEVwQChZgWSixwHFBvPNYhcxBHgsNXyNK64ohN/exec;
+
+/* ============================================================ */
+
+const params = new URLSearchParams(window.location.search);
+const employeeId = params.get("id");
+
+let EMPLOYEE = {};
+let DOCUMENTS = [];
+let VEHICLES = [];
+let EMERGENCY = { contact: "Shop Manager: 332-4715" };
+
+async function loadEmployee(){
+  const card = document.querySelector(".card");
+
+  if(!employeeId){
+    card.innerHTML = `<div style="padding:48px 24px;text-align:center;color:var(--muted);font-family:'Space Grotesk',sans-serif;">No employee ID provided in the link.</div>`;
+    return;
+  }
+  if(APPS_SCRIPT_URL.indexOf("PASTE_YOUR") === 0){
+    card.innerHTML = `<div style="padding:48px 24px;text-align:center;color:var(--muted);font-family:'Space Grotesk',sans-serif;">Apps Script URL not configured yet — see the comment at the top of the script.</div>`;
+    return;
+  }
+
+  try{
+    const res = await fetch(`${APPS_SCRIPT_URL}?id=${encodeURIComponent(employeeId)}`);
+    const data = await res.json();
+
+    if(data.error){
+      card.innerHTML = `<div style="padding:48px 24px;text-align:center;color:var(--muted);font-family:'Space Grotesk',sans-serif;">${data.error}</div>`;
+      return;
+    }
+
+    EMPLOYEE = {
+      name: data.Name,
+      role: data.Role,
+      nationality: data.Nationality,
+      workSite: data.WorkSite,
+      photoUrl: data.PhotoURL || null,
+    };
+
+    DOCUMENTS = [
+      { key:"passport", label:"Passport Number", value:data.PassportNumber || "N/A", fileUrl:data.PassportFileURL || null },
+      { key:"visa",     label:"Visa Number",     value:data.VisaNumber || "N/A",     fileUrl:data.VisaFileURL || null },
+      { key:"permit",   label:"Work Permit Number", value:data.WorkPermitNumber || "N/A", fileUrl:data.WorkPermitFileURL || null },
+      { key:"license",  label:"License Number",  value:data.LicenseNumber || "N/A",  fileUrl:data.LicenseFileURL || null },
+    ];
+
+    VEHICLES = [];
+    if(data.Vehicle1Plate){
+      VEHICLES.push({ plate:data.Vehicle1Plate, type:data.Vehicle1Type || "", fileUrl:data.Vehicle1FileURL || null });
+    }
+    if(data.Vehicle2Plate){
+      VEHICLES.push({ plate:data.Vehicle2Plate, type:data.Vehicle2Type || "", fileUrl:data.Vehicle2FileURL || null });
+    }
+
+    EMERGENCY = { contact: data.EmergencyContact || "Shop Manager: 332-4715" };
+
+    renderHeader();
+    renderInfoGrid();
+    renderVehicles();
+    renderEmergency();
+
+  } catch(err){
+    card.innerHTML = `<div style="padding:48px 24px;text-align:center;color:var(--muted);font-family:'Space Grotesk',sans-serif;">Couldn't load profile data. Please try again.</div>`;
+  }
+}
+
+/* ============================================================ */
+
+const ICONS = {
+  doc: `<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>`,
+  car: `<svg class="vehicle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5 17V9l2-4h10l2 4v8"/></svg>`,
+  empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9.5 13.5l5 5m0-5l-5 5"/></svg>`,
+};
+
+function initials(name){
+  return name.split(" ").filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join("");
+}
+
+function isImage(url){ return /\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(url); }
+function isPdf(url){ return /\.pdf(\?.*)?$/i.test(url); }
+function isDriveLink(url){ return /drive\.google\.com\/file\/d\//.test(url); }
+
+function renderHeader(){
+  document.getElementById("fullName").textContent = EMPLOYEE.name;
+  document.getElementById("role").textContent = EMPLOYEE.role;
+  document.getElementById("avatarInitials").textContent = initials(EMPLOYEE.name);
+  if(EMPLOYEE.photoUrl){
+    document.getElementById("avatar").innerHTML = `<img src="${EMPLOYEE.photoUrl}" alt="${EMPLOYEE.name}">`;
+  }
+}
+
+function renderInfoGrid(){
+  const grid = document.getElementById("infoGrid");
+  const staticCells = [
+    { label:"Nationality", value:EMPLOYEE.nationality },
+    { label:"Work Site", value:EMPLOYEE.workSite },
+  ];
+
+  staticCells.forEach(c=>{
+    const el = document.createElement("div");
+    el.className = "info-cell";
+    el.innerHTML = `<div class="info-label">${c.label}</div><div class="info-value">${c.value}</div>`;
+    grid.appendChild(el);
+  });
+
+  DOCUMENTS.forEach(doc=>{
+    const el = document.createElement("div");
+    el.className = "info-cell doc-cell";
+    el.innerHTML = `
+      <div class="doc-text">
+        <div class="info-label">${doc.label}</div>
+        <div class="info-value doc-value">${doc.value}</div>
+      </div>
+      ${ICONS.doc}
+    `;
+    el.addEventListener("click", ()=> openDoc(doc.label, doc.value, doc.fileUrl));
+    grid.appendChild(el);
+  });
+}
+
+function renderVehicles(){
+  const list = document.getElementById("vehicleList");
+  VEHICLES.forEach(v=>{
+    const el = document.createElement("div");
+    el.className = "vehicle-row";
+    el.innerHTML = `
+      <div style="flex:1;">
+        <div class="vehicle-plate">${v.plate}</div>
+        <div class="vehicle-type">${v.type}</div>
+      </div>
+      ${ICONS.car}
+    `;
+    el.addEventListener("click", ()=> openDoc(v.plate, v.type, v.fileUrl));
+    list.appendChild(el);
+  });
+}
+
+function renderEmergency(){
+  const digits = (EMERGENCY.contact.match(/[\d+-]+$/)||[""])[0].replace(/[^\d+]/g,"");
+  const btn = document.getElementById("emergencyBtn");
+  btn.textContent = EMERGENCY.contact;
+  btn.href = digits ? `tel:${digits}` : "#";
+}
+
+/* Modal */
+const overlay = document.getElementById("overlay");
+const sheetTitle = document.getElementById("sheetTitle");
+const sheetSub = document.getElementById("sheetSub");
+const sheetBody = document.getElementById("sheetBody");
+
+function openDoc(title, sub, url){
+  sheetTitle.textContent = title;
+  sheetSub.textContent = sub || "";
+
+  if(url){
+    if(isDriveLink(url)){
+      const openUrl = url.replace(/\/preview$/, "/view");
+      sheetBody.innerHTML = `
+        <div class="doc-preview"><iframe src="${url}" allow="autoplay"></iframe></div>
+        <a href="${openUrl}" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:10px;color:var(--green);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13.5px;">Open in Google Drive →</a>
+      `;
+    } else if(isImage(url)){
+      sheetBody.innerHTML = `<div class="doc-preview"><img src="${url}" alt="${title}"></div>`;
+    } else if(isPdf(url)){
+      sheetBody.innerHTML = `<div class="doc-preview"><iframe src="${url}"></iframe></div>`;
+    } else {
+      sheetBody.innerHTML = `<div class="doc-preview"><a href="${url}" target="_blank" rel="noopener" style="display:block;padding:16px;text-align:center;color:var(--green);font-family:'Space Grotesk',sans-serif;font-weight:700;">Open file →</a></div>`;
+    }
+  } else {
+    sheetBody.innerHTML = `
+      <div class="empty-state">
+        ${ICONS.empty}
+        <p>No document on file yet.<br>Add a file link for this field to enable the viewer.</p>
+      </div>`;
+  }
+  overlay.classList.add("open");
+}
+
+document.getElementById("sheetClose").addEventListener("click", ()=> overlay.classList.remove("open"));
+overlay.addEventListener("click", (e)=>{ if(e.target === overlay) overlay.classList.remove("open"); });
+
+loadEmployee();
+</script>
+
+</body>
+</html>
