@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hakatha Maldives — Card Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root{
+    --green-dark:#126b39;
+    --green:#126b39;
+    --yellow:#f6ec31;
+    --paper:#f6f7f3;
+    --panel:#ffffff;
+    --ink:#1c1d1b;
+    --muted:#6b6f68;
+    --line:#e4e6df;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .app{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    padding:28px;
+    max-width:1180px;
+    margin:0 auto;
+    align-items:flex-start;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px;
+  }
+  .form-panel{
+    flex:1 1 360px;
+    min-width:320px;
+  }
+  .form-panel h1{
+    font-family:'Poppins',sans-serif;
+    font-size:19px;
+    font-weight:700;
+    margin:0 0 2px;
+    color:var(--green-dark);
+  }
+  .form-panel p.sub{
+    margin:0 0 22px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:6px;
+    margin-top:16px;
+  }
+  label:first-of-type{margin-top:0;}
+  label .hint{
+    font-weight:400;
+    color:var(--muted);
+    font-size:11.5px;
+  }
+  input[type=text]{
+    width:100%;
+    padding:10px 12px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:#fbfbfa;
+    transition:border-color .15s;
+  }
+  input[type=text]:focus{
+    outline:none;
+    border-color:var(--green);
+    background:#fff;
+  }
+  .photo-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:8px;
+  }
+  .photo-thumb{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:#eef0eb center/cover no-repeat;
+    border:2px solid var(--line);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--muted);
+    font-size:10px;
+    text-align:center;
+  }
+  .file-btn{
+    display:inline-block;
+    padding:9px 16px;
+    background:#eef2ea;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--green-dark);
+    cursor:pointer;
+  }
+  .file-btn:hover{background:#e4e9df;}
+  input[type=file]{display:none;}
+  .actions{
+    margin-top:26px;
+    display:flex;
+    gap:10px;
+  }
+  button.primary{
+    flex:1;
+    padding:13px 16px;
+    background:var(--green-dark);
+    color:#fff;
+    border:none;
+    border-radius:9px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  button.primary:hover{background:#0f4423;}
+  button.primary:disabled{
+    background:#c9cdc3;
+    cursor:not-allowed;
+  }
+  button.secondary{
+    padding:13px 16px;
+    background:#fff;
+    color:var(--ink);
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  button.secondary:hover{border-color:#c9cdc3;}
+  .status{
+    margin-top:12px;
+    font-size:12px;
+    color:var(--muted);
+    min-height:16px;
+  }
+
+  .preview-panel{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    background:repeating-conic-gradient(#eef0ea 0% 25%, #f6f7f3 0% 50%) 50% / 20px 20px;
+    padding:36px 30px;
+  }
+  #cardCanvas{
+    width:300px;
+    height:480px;
+    display:block;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+  .hidden-logo{ display:none; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="panel form-panel">
+    <h1>Employee Card Generator</h1>
+    <p class="sub">Hakatha Maldives Pvt. Ltd. — pick an employee to auto-fill, or enter details manually.</p>
+
+    <label for="employeeSelect">Load from spreadsheet</label>
+    <select id="employeeSelect" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);background:#fbfbfa;">
+      <option value="">Loading employee list…</option>
+    </select>
+
+    <label for="name">Full name</label>
+    <input type="text" id="name" placeholder="e.g. Mohamed Anis Ahamed">
+
+    <label for="visa">Visa No.</label>
+    <input type="text" id="visa" placeholder="e.g. WV2025130490">
+
+    <label for="permit">Work Permit No.</label>
+    <input type="text" id="permit" placeholder="e.g. WP00405014">
+
+    <label for="passport">Passport No.</label>
+    <input type="text" id="passport" placeholder="e.g. A17546838">
+
+    <label for="qrdata">QR code content <span class="hint">— auto-filled with their profile page link</span></label>
+    <input type="text" id="qrdata" placeholder="e.g. https://drive.google.com/...">
+
+    <label>Photo</label>
+    <div class="photo-row">
+      <div class="photo-thumb" id="photoThumb">No photo</div>
+      <label class="file-btn" for="photoInput">Choose photo</label>
+      <input type="file" id="photoInput" accept="image/*">
+    </div>
+
+    <div class="actions">
+      <button class="secondary" id="resetBtn">Reset</button>
+      <button class="primary" id="downloadBtn">Download PNG</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel preview-panel">
+    <canvas id="cardCanvas" width="600" height="960"></canvas>
+    <div style="font-size:12px;color:var(--muted)">Live preview — exports at full 1800×2880 resolution</div>
+  </div>
+
+</div>
+
+<!-- Hidden source for the real brand logo (rasterized onto canvas via Image) -->
+<div class="hidden-logo">
+  <svg id="logoSource" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1294.35 397.97">
+    <defs>
+      <style>
+        .cls-1 { fill: #126b39; }
+        .cls-2 { fill: #f6ec31; }
+      </style>
+    </defs>
+    <g>
+      <g>
+        <path class="cls-1" d="M258.52,148.87c-.62-1.4-1.23-2.8-1.91-4.12-.05-.14-.17-.31-.2-.41-3.89-7.93-8.54-15.41-13.84-22.39-.19-.14-.25-.31-.36-.48C177.1,35.48,173.79,30.82,169,0c0,0-81.28,47.89-131.1,110.06-16.12,16.7-27.91,37.4-33.8,60.58C1.31,180.25-.2,189.95.02,199.63h.05c0,1.4-.05,2.81-.05,4.2C.02,278.43,60.46,338.95,135.07,338.95s135.16-60.52,135.16-135.11c0,0,2.13-24.43-11.71-54.97Z"/>
+        <path class="cls-2" d="M171.49,95.63v73.49h-71.84v-73.86c-46.18,14.9-79.52,58.25-79.52,109.41s33.34,94.48,79.52,109.42v-73.16h71.84v72.85c45.67-15.25,78.65-58.3,78.65-109.11s-32.98-93.89-78.65-109.04Z"/>
+      </g>
+      <g>
+        <path class="cls-1" d="M913.47,343.81c4.22,3.52,6.33,8.4,6.33,14.65s-2.11,11.05-6.33,14.57c-4.22,3.52-10.05,5.28-17.48,5.28h-16.89v19.34h-4.31v-59.1h21.19c7.43,0,13.26,1.76,17.48,5.28ZM910.43,370.28c3.32-2.76,4.98-6.7,4.98-11.82s-1.66-9.08-4.98-11.86c-3.32-2.79-8.13-4.18-14.44-4.18h-16.89v32h16.89c6.3,0,11.12-1.38,14.44-4.14Z"/>
+        <path class="cls-1" d="M988.28,338.53l-26.34,59.1h-4.31l-26.34-59.1h4.73l23.9,53.53,23.89-53.53h4.48Z"/>
+        <path class="cls-1" d="M1017.41,342.42h-21.28v-3.88h46.86v3.88h-21.28v55.22h-4.31v-55.22Z"/>
+        <path class="cls-1" d="M1053.92,396.92c-.7-.7-1.06-1.56-1.06-2.58s.35-1.86,1.06-2.53c.7-.67,1.53-1.01,2.49-1.01s1.79.34,2.49,1.01c.7.68,1.06,1.52,1.06,2.53s-.35,1.87-1.06,2.58c-.71.7-1.53,1.06-2.49,1.06s-1.79-.35-2.49-1.06Z"/>
+        <path class="cls-1" d="M1111.38,338.53h4.31v55.22h34.03v3.88h-38.33v-59.1Z"/>
+        <path class="cls-1" d="M1173.86,342.42h-21.28v-3.88h46.86v3.88h-21.28v55.22h-4.31v-55.22Z"/>
+        <path class="cls-1" d="M1217.35,338.53h23.39c6.13,0,11.58,1.27,16.34,3.8,4.76,2.53,8.46,6.04,11.1,10.51,2.65,4.48,3.97,9.56,3.97,15.24s-1.32,10.77-3.97,15.24c-2.65,4.48-6.35,7.98-11.1,10.51-4.76,2.53-10.2,3.8-16.34,3.8h-23.39v-59.1ZM1240.4,393.75c5.46,0,10.27-1.08,14.44-3.25,4.17-2.17,7.37-5.19,9.63-9.08,2.25-3.88,3.38-8.33,3.38-13.34s-1.13-9.46-3.38-13.34c-2.25-3.88-5.46-6.91-9.63-9.08-4.17-2.17-8.98-3.25-14.44-3.25h-18.74v51.34h18.74Z"/>
+        <path class="cls-1" d="M1288.31,396.92c-.7-.7-1.06-1.56-1.06-2.58s.35-1.86,1.06-2.53c.7-.67,1.53-1.01,2.49-1.01s1.79.34,2.49,1.01c.7.68,1.06,1.52,1.06,2.53s-.35,1.87-1.06,2.58c-.71.7-1.53,1.06-2.49,1.06s-1.79-.35-2.49-1.06Z"/>
+      </g>
+      <g>
+        <path class="cls-1" d="M443.25,50.93v117.66h-33.28v-45.89h-45.39v45.89h-33.28V50.93h33.28v44.21h45.39v-44.21h33.28Z"/>
+        <path class="cls-1" d="M556.55,145.73h-49.76l-9.25,22.86h-33.95l51.94-117.66h32.78l52.11,117.66h-34.63l-9.24-22.86ZM546.8,121.19l-15.13-37.65-15.13,37.65h30.26Z"/>
+        <path class="cls-1" d="M666.14,125.89l-12.44,13.28v29.42h-32.95V50.93h32.95v48.91l45.55-48.91h36.64l-48.07,52.11,50.6,65.56h-38.66l-33.62-42.7Z"/>
+        <path class="cls-1" d="M831.38,145.73h-49.76l-9.24,22.86h-33.96l51.94-117.66h32.78l52.11,117.66h-34.63l-9.25-22.86ZM821.63,121.19l-15.13-37.65-15.13,37.65h30.26Z"/>
+        <path class="cls-1" d="M914.76,77.31h-36.14v-26.39h105.39v26.39h-35.97v91.27h-33.28v-91.27Z"/>
+        <path class="cls-1" d="M1119.32,50.93v117.66h-33.28v-45.89h-45.39v45.89h-33.28V50.93h33.28v44.21h45.39v-44.21h33.28Z"/>
+        <path class="cls-1" d="M1232.62,145.73h-49.76l-9.24,22.86h-33.96l51.94-117.66h32.78l52.11,117.66h-34.63l-9.24-22.86ZM1222.87,121.19l-15.13-37.65-15.13,37.65h30.26Z"/>
+        <g>
+          <path class="cls-1" d="M437.54,314.54l-.34-62.36-30.26,50.76h-14.79l-30.09-49.08v60.68h-30.76v-117.67h27.4l41.35,67.91,40.34-67.91h27.4l.34,117.67h-30.59Z"/>
+          <path class="cls-1" d="M573.19,291.68h-49.76l-9.25,22.86h-33.95l51.94-117.67h32.78l52.11,117.67h-34.63l-9.24-22.86ZM563.44,267.14l-15.13-37.65-15.13,37.65h30.26Z"/>
+          <path class="cls-1" d="M629.16,196.88h33.28v91.27h56.14v26.39h-89.43v-117.67Z"/>
+          <path class="cls-1" d="M734.39,196.88h55.64c12.89,0,24.32,2.41,34.29,7.23,9.97,4.82,17.7,11.66,23.2,20.51,5.49,8.85,8.24,19.22,8.24,31.1s-2.75,22.25-8.24,31.1c-5.49,8.85-13.22,15.69-23.2,20.51-9.97,4.82-21.41,7.23-34.29,7.23h-55.64v-117.67ZM788.68,287.98c10.09,0,18.18-2.86,24.29-8.57,6.11-5.72,9.16-13.62,9.16-23.7s-3.05-17.99-9.16-23.7c-6.11-5.71-14.2-8.57-24.29-8.57h-21.01v64.55h21.01Z"/>
+          <path class="cls-1" d="M875.92,196.88h33.28v117.67h-33.28v-117.67Z"/>
+          <path class="cls-1" d="M1054.6,196.88l-50.43,117.67h-32.78l-50.26-117.67h35.97l31.94,76.65,32.61-76.65h32.95Z"/>
+          <path class="cls-1" d="M1158.65,288.82v25.72h-94.47v-117.67h92.28v25.72h-59.34v19.84h52.28v24.88h-52.28v21.52h61.52Z"/>
+          <path class="cls-1" d="M1193.44,313.36c-8.97-2.35-16.25-5.49-21.85-9.41l10.93-24.54c5.27,3.47,11.37,6.28,18.32,8.4,6.95,2.13,13.78,3.19,20.51,3.19,12.77,0,19.16-3.19,19.16-9.58,0-3.36-1.82-5.85-5.46-7.48-3.64-1.62-9.5-3.33-17.57-5.13-8.85-1.9-16.25-3.95-22.19-6.14-5.94-2.19-11.04-5.69-15.3-10.51-4.26-4.82-6.39-11.32-6.39-19.5,0-7.17,1.96-13.64,5.88-19.41,3.92-5.77,9.77-10.34,17.57-13.7,7.79-3.36,17.34-5.04,28.66-5.04,7.73,0,15.35.87,22.86,2.61,7.51,1.74,14.12,4.29,19.84,7.65l-10.25,24.71c-11.21-6.05-22.08-9.08-32.61-9.08-6.61,0-11.43.98-14.46,2.94-3.02,1.96-4.54,4.51-4.54,7.65s1.79,5.49,5.38,7.06c3.58,1.57,9.36,3.19,17.31,4.87,8.96,1.91,16.39,3.95,22.27,6.14,5.88,2.19,10.98,5.66,15.3,10.42,4.31,4.76,6.47,11.24,6.47,19.41,0,7.06-1.96,13.45-5.88,19.16-3.92,5.72-9.81,10.28-17.65,13.7-7.85,3.42-17.37,5.13-28.58,5.13-9.53,0-18.77-1.18-27.73-3.53Z"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ============================================================
+   CONNECT TO THE SPREADSHEET
+   Same Apps Script URL used by the employee profile page.
+   PROFILE_BASE_URL is the live URL of employee-profile.html —
+   this is what gets encoded into each QR code.
+   PHOTO_BASE_URL + a row's PhotoURL column = where each photo lives.
+   ============================================================ */
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6A2TBgcw9LuZuia44zTffwFybTSxEVwQChZgWSixwHFBvPNYhcxBHgsNXyNK64ohN/exec";
+const PROFILE_BASE_URL = "https://mlibaan.github.io/Hakatha-Employees/index.html";
+const PHOTO_BASE_URL = "https://mlibaan.github.io/Hakatha-Employees/";
+
+/* ============================================================ */
+
+const GREEN = '#126b39';
+const YELLOW = '#f6ec31';
+
+const LAYOUT = {
+  W: 600, H: 960,
+  padX: 46, padTop: 40,
+  logoW: 508,               // = W - 2*padX
+  logoRatio: 397.97 / 1294.35,
+  photoR: 100,
+  qrSize: 180,
+  qrRightOffset: 46,
+  qrBottomOffset: 118
+};
+
+const state = {
+  name: '', visa: '', permit: '', passport: '',
+  employeeId: '',
+  qrText: '',
+  qrMatrix: null,
+  photoImg: null,
+  logoImg: null
+};
+
+// ---------- Logo: rasterize the real brand SVG once ----------
+function loadLogoImage(){
+  const svgMarkup = document.getElementById('logoSource').outerHTML;
+  const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+
+// ---------- QR: compute a raw module matrix (no DOM/image involved) ----------
+function computeQRMatrix(text){
+  if(!text) return null;
+  try{
+    const qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    const count = qr.getModuleCount();
+    const matrix = [];
+    for(let r=0;r<count;r++){
+      const row = [];
+      for(let c=0;c<count;c++) row.push(qr.isDark(r,c));
+      matrix.push(row);
+    }
+    return matrix;
+  }catch(e){
+    console.error('QR generation failed', e);
+    return null;
+  }
+}
+
+function drawQR(ctx, matrix, x, y, size){
+  if(!matrix){
+    ctx.fillStyle = '#f4f4f2';
+    ctx.fillRect(x, y, size, size);
+    ctx.fillStyle = '#aaaaaa';
+    ctx.font = '12px Inter';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('QR', x + size/2, y + size/2);
+    return;
+  }
+  const count = matrix.length;
+  const cell = size / count;
+  ctx.fillStyle = '#141414';
+  for(let r=0;r<count;r++){
+    for(let c=0;c<count;c++){
+      if(matrix[r][c]) ctx.fillRect(x + c*cell, y + r*cell, cell + 0.6, cell + 0.6);
+    }
+  }
+}
+
+function drawPhoto(ctx, img, cx, cy, r){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.closePath();
+  ctx.clip();
+  if(img){
+    const scale = Math.max((r*2)/img.width, (r*2)/img.height);
+    const w = img.width*scale, h = img.height*scale;
+    ctx.drawImage(img, cx - w/2, cy - h/2, w, h);
+  } else {
+    ctx.fillStyle = '#eef0ea';
+    ctx.fillRect(cx-r, cy-r, r*2, r*2);
+    ctx.fillStyle = '#9aa094';
+    ctx.font = '13px Inter';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Photo', cx, cy);
+  }
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = GREEN;
+  ctx.stroke();
+}
+
+// ---------- Main draw: single deterministic pass, no DOM cloning involved ----------
+function drawCard(ctx, s){
+  const { W, H, padX, padTop, logoW, photoR } = LAYOUT;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Logo
+  const logoH = logoW * LAYOUT.logoRatio;
+  if(s.logoImg) ctx.drawImage(s.logoImg, padX, padTop, logoW, logoH);
+
+  // Photo
+  const photoTop = padTop + logoH + 20;
+  const cx = W/2, cy = photoTop + photoR;
+  drawPhoto(ctx, s.photoImg, cx, cy, photoR);
+
+  // Name (auto-shrink to fit)
+  const maxNameWidth = W - 80;
+  let fontSize = 30;
+  ctx.font = `700 ${fontSize}px Poppins`;
+  const nameText = s.name || 'Full Name';
+  while(ctx.measureText(nameText).width > maxNameWidth && fontSize > 16){
+    fontSize -= 1;
+    ctx.font = `700 ${fontSize}px Poppins`;
+  }
+  ctx.fillStyle = '#141414';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  const nameBaselineY = cy + photoR + 26 + fontSize;
+  ctx.fillText(nameText, W/2, nameBaselineY);
+
+  // Field blocks
+  let cursorY = nameBaselineY + 20;
+  function field(label, value){
+    cursorY += 22;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = GREEN;
+    ctx.font = '700 20px Poppins';
+    ctx.fillText(label, padX, cursorY + 18);
+    cursorY += 24;
+    ctx.font = '500 26px Poppins';
+    ctx.fillText(value || '—', padX, cursorY + 24);
+    cursorY += 28;
+  }
+  field('Visa No:', s.visa);
+  field('Work Permit No:', s.permit);
+  field('Passport No:', s.passport);
+
+  // QR box
+  const qrX = W - LAYOUT.qrRightOffset - LAYOUT.qrSize;
+  const qrY = H - LAYOUT.qrBottomOffset - LAYOUT.qrSize;
+  ctx.strokeStyle = '#141414';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(qrX + 1, qrY + 1, LAYOUT.qrSize - 2, LAYOUT.qrSize - 2);
+  const inset = 8;
+  drawQR(ctx, s.qrMatrix, qrX + inset, qrY + inset, LAYOUT.qrSize - inset*2);
+
+  // Bottom stripes
+  ctx.fillStyle = YELLOW;
+  ctx.fillRect(0, H - 56, W, 10);
+  ctx.fillStyle = GREEN;
+  ctx.fillRect(0, H - 46, W, 46);
+}
+
+// ---------- Spreadsheet integration ----------
+async function loadEmployeeList(){
+  const select = $('employeeSelect');
+  if(APPS_SCRIPT_URL.indexOf("PASTE_YOUR") === 0){
+    select.innerHTML = `<option value="">Not connected — see APPS_SCRIPT_URL in the code</option>`;
+    return;
+  }
+  try{
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=list`);
+    const list = await res.json();
+    if(!Array.isArray(list)) throw new Error('Unexpected response');
+
+    select.innerHTML = `<option value="">— Select an employee —</option>` +
+      list.map(emp => `<option value="${emp.ID}">${emp.Name} (${emp.ID})</option>`).join('');
+  }catch(err){
+    select.innerHTML = `<option value="">Couldn't load list — check connection</option>`;
+    console.error('Employee list load failed', err);
+  }
+}
+
+function loadPhotoFromUrl(url){
+  return new Promise((resolve) => {
+    if(!url){ resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+async function loadSelectedEmployee(id){
+  const status = $('status');
+  if(!id) return;
+
+  status.textContent = 'Loading employee…';
+  try{
+    const res = await fetch(`${APPS_SCRIPT_URL}?id=${encodeURIComponent(id)}`);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+
+    nameInput.value = data.Name || '';
+    visaInput.value = data.VisaNumber || '';
+    permitInput.value = data.WorkPermitNumber || '';
+    passportInput.value = data.PassportNumber || '';
+
+    const profileUrl = PROFILE_BASE_URL.indexOf("PASTE_YOUR") === 0
+      ? ''
+      : `${PROFILE_BASE_URL}?id=${encodeURIComponent(id)}`;
+    qrInput.value = profileUrl;
+
+    state.name = nameInput.value;
+    state.visa = visaInput.value;
+    state.permit = permitInput.value;
+    state.passport = passportInput.value;
+    state.employeeId = data.ID || id;
+    state.qrText = profileUrl;
+    state.qrMatrix = computeQRMatrix(profileUrl);
+
+    if(data.PhotoURL && PHOTO_BASE_URL.indexOf("PASTE_YOUR") !== 0){
+      status.textContent = 'Loading photo…';
+      const photoUrl = PHOTO_BASE_URL + data.PhotoURL;
+      const img = await loadPhotoFromUrl(photoUrl);
+      if(img){
+        state.photoImg = img;
+        $('photoThumb').style.backgroundImage = `url(${photoUrl})`;
+        $('photoThumb').textContent = '';
+      } else {
+        state.photoImg = null;
+        $('photoThumb').style.backgroundImage = '';
+        $('photoThumb').textContent = 'No photo';
+      }
+    } else {
+      state.photoImg = null;
+      $('photoThumb').style.backgroundImage = '';
+      $('photoThumb').textContent = 'No photo';
+    }
+
+    renderPreview();
+    checkReady();
+    status.textContent = `Loaded ${data.Name}.`;
+    setTimeout(() => { if(status.textContent.indexOf('Loaded') === 0) status.textContent = ''; }, 2500);
+  }catch(err){
+    status.textContent = "Couldn't load that employee.";
+    console.error('Employee load failed', err);
+  }
+}
+
+// ---------- Wiring ----------
+const previewCanvas = $('cardCanvas');
+const previewCtx = previewCanvas.getContext('2d');
+
+function renderPreview(){
+  drawCard(previewCtx, state);
+}
+
+const nameInput = $('name'), visaInput = $('visa'), permitInput = $('permit'),
+      passportInput = $('passport'), qrInput = $('qrdata'), photoInput = $('photoInput'),
+      employeeSelect = $('employeeSelect');
+
+employeeSelect.addEventListener('change', () => {
+  if(employeeSelect.value) loadSelectedEmployee(employeeSelect.value);
+});
+
+function checkReady(){
+  $('downloadBtn').disabled = nameInput.value.trim().length === 0;
+}
+
+[nameInput, visaInput, permitInput, passportInput].forEach(el => {
+  el.addEventListener('input', () => {
+    state.name = nameInput.value.trim();
+    state.visa = visaInput.value.trim();
+    state.permit = permitInput.value.trim();
+    state.passport = passportInput.value.trim();
+    state.employeeId = '';
+    employeeSelect.value = '';
+    renderPreview();
+    checkReady();
+  });
+});
+
+qrInput.addEventListener('input', () => {
+  state.qrText = qrInput.value.trim();
+  state.qrMatrix = computeQRMatrix(state.qrText);
+  renderPreview();
+});
+
+photoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      state.photoImg = img;
+      renderPreview();
+    };
+    img.src = ev.target.result;
+    $('photoThumb').style.backgroundImage = `url(${ev.target.result})`;
+    $('photoThumb').textContent = '';
+  };
+  reader.readAsDataURL(file);
+});
+
+$('resetBtn').addEventListener('click', () => {
+  [nameInput, visaInput, permitInput, passportInput, qrInput].forEach(el => el.value = '');
+  photoInput.value = '';
+  employeeSelect.value = '';
+  Object.assign(state, { name:'', visa:'', permit:'', passport:'', employeeId:'', qrText:'', qrMatrix:null, photoImg:null });
+  $('photoThumb').style.backgroundImage = '';
+  $('photoThumb').textContent = 'No photo';
+  $('status').textContent = '';
+  renderPreview();
+  checkReady();
+});
+
+$('downloadBtn').addEventListener('click', async () => {
+  const status = $('status');
+  const btn = $('downloadBtn');
+  btn.disabled = true;
+  status.textContent = 'Rendering high-resolution card…';
+  try{
+    await Promise.all([
+      document.fonts.load('800 30px Poppins'),
+      document.fonts.load('700 26px Poppins'),
+      document.fonts.load('700 20px Poppins'),
+      document.fonts.load('500 26px Poppins'),
+      document.fonts.load('600 13px Inter')
+    ]);
+    await document.fonts.ready;
+
+    const scale = 3;
+    const off = document.createElement('canvas');
+    off.width = LAYOUT.W * scale;
+    off.height = LAYOUT.H * scale;
+    const octx = off.getContext('2d');
+    octx.scale(scale, scale);
+    drawCard(octx, state);
+
+    const link = document.createElement('a');
+    const safeName = (state.name || 'employee').replace(/[^a-z0-9]+/gi, '_');
+    const idPrefix = state.employeeId ? `${state.employeeId}_` : '';
+    link.download = `${idPrefix}${safeName}_card.png`;
+    link.href = off.toDataURL('image/png');
+    link.click();
+    status.textContent = 'Downloaded.';
+    setTimeout(() => status.textContent = '', 2500);
+  }catch(err){
+    if(err.name === 'SecurityError'){
+      status.textContent = "Couldn't export — the employee's photo blocked it. Try removing and re-adding it manually.";
+    } else {
+      status.textContent = 'Something went wrong rendering the card.';
+    }
+    console.error(err);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+// ---------- Init ----------
+checkReady();
+renderPreview(); // draw immediately with fallback fonts/placeholder logo
+loadEmployeeList();
+
+loadLogoImage().then(img => {
+  state.logoImg = img;
+  renderPreview();
+});
+
+Promise.all([
+  document.fonts.load('800 30px Poppins'),
+  document.fonts.load('700 26px Poppins'),
+  document.fonts.load('700 20px Poppins'),
+  document.fonts.load('500 26px Poppins'),
+  document.fonts.load('600 13px Inter')
+]).then(() => document.fonts.ready).then(renderPreview);
+</script>
+
+</body>
+</html>
