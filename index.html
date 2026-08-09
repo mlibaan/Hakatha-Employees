@@ -53,6 +53,7 @@
   .info-value{font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--ink);margin-top:4px;}
 
   .doc-cell{cursor:pointer;background:var(--row-bg);border:1px solid transparent;transition:background .15s ease, transform .1s ease;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .full-span{grid-column:1 / -1;}
   .doc-cell:hover{background:#eef4ee;}
   .doc-cell:active{transform:scale(0.98);}
   .doc-cell .doc-text{min-width:0;}
@@ -64,12 +65,12 @@
   .section{padding:20px 24px 6px;}
   .section-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--green);text-transform:uppercase;}
 
-  .vehicle-list{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
-  .vehicle-row{display:flex;align-items:center;gap:12px;background:var(--row-bg);border-radius:12px;padding:12px 12px;cursor:pointer;transition:background .15s ease, transform .1s ease;}
+  .vehicle-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+  .vehicle-row{display:flex;align-items:center;gap:10px;background:var(--row-bg);border-radius:12px;padding:10px 12px;cursor:pointer;transition:background .15s ease, transform .1s ease;}
   .vehicle-row:hover{background:#eef4ee;}
   .vehicle-row:active{transform:scale(0.98);}
-  .vehicle-plate{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ink);}
-  .vehicle-type{font-size:12px;color:var(--muted);margin-top:1px;}
+  .vehicle-plate{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
+  .vehicle-type{font-size:10.5px;color:var(--muted);margin-top:2px;}
   .vehicle-icon{width:18px;height:18px;flex-shrink:0;color:var(--green);opacity:.75;}
 
   .emergency{margin:24px 0 0;padding:26px 24px;background:var(--green);text-align:center;}
@@ -210,12 +211,18 @@ async function loadEmployee(){
       photoUrl: data.PhotoURL || null,
     };
 
+    const hasLicense = !!(data.LicenseNumber && String(data.LicenseNumber).trim());
+
     DOCUMENTS = [
-      { key:"passport", label:"Passport Number", value:data.PassportNumber || "N/A", fileUrl:data.PassportFileURL || null },
-      { key:"visa",     label:"Visa Number",     value:data.VisaNumber || "N/A",     fileUrl:data.VisaFileURL || null },
-      { key:"permit",   label:"Work Permit Number", value:data.WorkPermitNumber || "N/A", fileUrl:data.WorkPermitFileURL || null },
-      { key:"license",  label:"License Number",  value:data.LicenseNumber || "N/A",  fileUrl:data.LicenseFileURL || null },
+      { key:"passport", label:"Passport Number", value:data.PassportNumber || "N/A", fileUrl:data.PassportFileURL || null, fullSpan:!hasLicense },
     ];
+    if(hasLicense){
+      DOCUMENTS.push({ key:"license", label:"License Number", value:data.LicenseNumber, fileUrl:data.LicenseFileURL || null });
+    }
+    DOCUMENTS.push(
+      { key:"visa",   label:"Visa Number", value:data.VisaNumber || "N/A", fileUrl:data.VisaFileURL || null },
+      { key:"permit", label:"Work Permit Number", value:data.WorkPermitNumber || "N/A", fileUrl:data.WorkPermitFileURL || null }
+    );
 
     VEHICLES = [];
     if(data.Vehicle1Plate){
@@ -280,7 +287,7 @@ function renderInfoGrid(){
 
   DOCUMENTS.forEach(doc=>{
     const el = document.createElement("div");
-    el.className = "info-cell doc-cell";
+    el.className = "info-cell doc-cell" + (doc.fullSpan ? " full-span" : "");
     el.innerHTML = `
       <div class="doc-text">
         <div class="info-label">${doc.label}</div>
