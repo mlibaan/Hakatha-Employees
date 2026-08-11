@@ -323,7 +323,24 @@ const sheetBody = document.getElementById("sheetBody");
 const sheetBack = document.getElementById("sheetBack");
 let sheetBackHandler = null;
 
+// Google Drive's embedded preview is a fairly heavy mini-page. Just hiding
+// the sheet (CSS) leaves it fully loaded and running in the background —
+// tap through a few documents in a row without this and they pile up,
+// which is what was causing the freezing. Blanking the iframe's src before
+// tearing it out of the DOM forces the browser to actually release it.
+function clearSheetBody(){
+  const existingIframe = sheetBody.querySelector("iframe");
+  if(existingIframe) existingIframe.src = "about:blank";
+  sheetBody.innerHTML = "";
+}
+
+function closeSheet(){
+  overlay.classList.remove("open");
+  clearSheetBody();
+}
+
 function openDoc(title, sub, url, onBack){
+  clearSheetBody();
   sheetTitle.textContent = title;
   sheetSub.textContent = sub || "";
 
@@ -332,7 +349,7 @@ function openDoc(title, sub, url, onBack){
 
   if(url){
     if(isDriveLink(url)){
-      sheetBody.innerHTML = `<div class="doc-preview"><iframe src="${url}" allow="autoplay"></iframe></div>`;
+      sheetBody.innerHTML = `<div class="doc-preview"><iframe src="${url}"></iframe></div>`;
     } else if(isImage(url)){
       sheetBody.innerHTML = `<div class="doc-preview"><img src="${url}" alt="${title}"></div>`;
     } else if(isPdf(url)){
@@ -356,6 +373,7 @@ function openDoc(title, sub, url, onBack){
 // the same openDoc() viewer used for passport/visa/license/permit, with a
 // back button that returns here.
 function openVehicleMenu(v){
+  clearSheetBody();
   sheetTitle.textContent = v.plate;
   sheetSub.textContent = "";
   sheetBackHandler = null;
@@ -384,8 +402,8 @@ function openVehicleMenu(v){
 }
 
 sheetBack.addEventListener("click", ()=>{ if(sheetBackHandler) sheetBackHandler(); });
-document.getElementById("sheetClose").addEventListener("click", ()=> overlay.classList.remove("open"));
-overlay.addEventListener("click", (e)=>{ if(e.target === overlay) overlay.classList.remove("open"); });
+document.getElementById("sheetClose").addEventListener("click", closeSheet);
+overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeSheet(); });
 
 loadEmployee();
 </script>
