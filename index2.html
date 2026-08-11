@@ -38,7 +38,7 @@
   .brand-name b{display:block;font-weight:800;font-size:19px;color:var(--accent);letter-spacing:0.2px;}
   .brand-name small{display:block;font-weight:500;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-top:1px;}
 
-  .divider{height:4px;background:var(--accent);margin-top:8px;}
+  .divider{height:7px;margin-top:8px;background:linear-gradient(var(--accent), var(--accent) 40%, var(--yellow) 40%, var(--yellow) 60%, var(--accent) 60%);}
 
   .id-block{padding:0 24px 4px;text-align:center;}
   .avatar{width:104px;height:104px;border-radius:50%;margin:-52px auto 0;background:var(--accent);display:flex;align-items:center;justify-content:center;border:3px solid var(--card-bg);box-shadow:0 6px 18px rgba(0,0,0,0.15);overflow:hidden;}
@@ -66,11 +66,10 @@
   .section-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
 
   .vehicle-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
-  .vehicle-row{display:flex;align-items:center;gap:10px;background:var(--row-bg);border-radius:12px;padding:10px 12px;cursor:pointer;transition:background .15s ease, transform .1s ease;}
+  .vehicle-row{display:flex;align-items:center;justify-content:center;background:var(--row-bg);border-radius:12px;padding:14px 12px;cursor:pointer;transition:background .15s ease, transform .1s ease;}
   .vehicle-row:hover{background:#eef4ee;}
   .vehicle-row:active{transform:scale(0.98);}
   .vehicle-plate{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
-  .vehicle-icon{width:18px;height:18px;flex-shrink:0;color:var(--accent);opacity:.75;}
 
   .footer-bar{display:flex;height:10px;}
   .footer-bar div{flex:1;background:var(--accent);}
@@ -91,8 +90,8 @@
   .empty-state svg{width:34px;height:34px;color:var(--muted);opacity:.6;margin-bottom:10px;}
   .empty-state p{font-size:13.5px;line-height:1.5;margin:0;}
   .sheet-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
-  .sheet-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
-  .sheet-fields .info-cell{background:var(--row-bg);}
+  .vehicle-doc-list{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+  .vehicle-doc-list .doc-cell{width:100%;}
 </style>
 </head>
 <body>
@@ -122,7 +121,7 @@
 
     <div class="section-sep"></div>
 
-    <div class="section">
+    <div class="section" id="vehiclesSection">
       <div class="section-title">Vehicles</div>
       <div class="vehicle-list" id="vehicleList"></div>
     </div>
@@ -218,16 +217,22 @@ async function loadEmployee(){
     VEHICLES = [];
     if(data.Vehicle1Plate){
       VEHICLES.push({
-        plate:data.Vehicle1Plate, type:data.Vehicle1Type || "", fileUrl:data.Vehicle1FileURL || null,
-        annualFee:data.Vehicle1AnnualFee || "N/A", insurance:data.Vehicle1Insurance || "N/A", roadworthiness:data.Vehicle1Roadworthiness || "N/A"
+        plate:data.Vehicle1Plate,
+        annualFeeUrl:data.Vehicle1AnnualFee || null,
+        insuranceUrl:data.Vehicle1Insurance || null,
+        roadworthinessUrl:data.Vehicle1Roadworthiness || null,
       });
     }
     if(data.Vehicle2Plate){
       VEHICLES.push({
-        plate:data.Vehicle2Plate, type:data.Vehicle2Type || "", fileUrl:data.Vehicle2FileURL || null,
-        annualFee:data.Vehicle2AnnualFee || "N/A", insurance:data.Vehicle2Insurance || "N/A", roadworthiness:data.Vehicle2Roadworthiness || "N/A"
+        plate:data.Vehicle2Plate,
+        annualFeeUrl:data.Vehicle2AnnualFee || null,
+        insuranceUrl:data.Vehicle2Insurance || null,
+        roadworthinessUrl:data.Vehicle2Roadworthiness || null,
       });
     }
+
+    document.getElementById("vehiclesSection").style.display = hasLicense ? "" : "none";
 
     renderHeader();
     renderInfoGrid();
@@ -244,7 +249,6 @@ async function loadEmployee(){
 
 const ICONS = {
   doc: `<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>`,
-  car: `<svg class="vehicle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5 17V9l2-4h10l2 4v8"/></svg>`,
   empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9.5 13.5l5 5m0-5l-5 5"/></svg>`,
 };
 
@@ -299,17 +303,8 @@ function renderVehicles(){
   VEHICLES.forEach(v=>{
     const el = document.createElement("div");
     el.className = "vehicle-row";
-    el.innerHTML = `
-      <div style="flex:1;">
-        <div class="vehicle-plate">${v.plate}</div>
-      </div>
-      ${ICONS.car}
-    `;
-    el.addEventListener("click", ()=> openDoc(v.plate, "", v.fileUrl, [
-      { label:"Annual Fee", value:v.annualFee },
-      { label:"Insurance", value:v.insurance },
-      { label:"Roadworthiness", value:v.roadworthiness, fullSpan:true },
-    ]));
+    el.innerHTML = `<div class="vehicle-plate">${v.plate}</div>`;
+    el.addEventListener("click", ()=> openVehicleMenu(v));
     list.appendChild(el);
   });
 }
@@ -320,7 +315,7 @@ const sheetTitle = document.getElementById("sheetTitle");
 const sheetSub = document.getElementById("sheetSub");
 const sheetBody = document.getElementById("sheetBody");
 
-function openDoc(title, sub, url, fields){
+function openDoc(title, sub, url){
   sheetTitle.textContent = title;
   sheetSub.textContent = sub || "";
 
@@ -342,15 +337,34 @@ function openDoc(title, sub, url, fields){
       </div>`;
   }
 
-  if(fields && fields.length){
-    const fieldsHtml = fields.map(f => `
-      <div class="info-cell${f.fullSpan ? " full-span" : ""}">
-        <div class="info-label">${f.label}</div>
-        <div class="info-value">${f.value}</div>
+  overlay.classList.add("open");
+}
+
+// Tapping a vehicle opens a menu of its three document tiles (title only,
+// no value) — tapping one of THOSE previews that specific document, reusing
+// the same openDoc() viewer used for passport/visa/license/permit.
+function openVehicleMenu(v){
+  sheetTitle.textContent = v.plate;
+  sheetSub.textContent = "";
+
+  const fields = [
+    { label:"Annual Fee", url:v.annualFeeUrl },
+    { label:"Insurance", url:v.insuranceUrl },
+    { label:"Roadworthiness", url:v.roadworthinessUrl },
+  ];
+
+  sheetBody.innerHTML = `<div class="vehicle-doc-list">${
+    fields.map(f => `
+      <div class="info-cell doc-cell">
+        <div class="doc-text"><div class="info-label">${f.label}</div></div>
+        ${ICONS.doc}
       </div>
-    `).join("");
-    sheetBody.innerHTML += `<div class="sheet-fields">${fieldsHtml}</div>`;
-  }
+    `).join("")
+  }</div>`;
+
+  Array.from(sheetBody.querySelectorAll(".doc-cell")).forEach((el, i)=>{
+    el.addEventListener("click", ()=> openDoc(fields[i].label, "", fields[i].url));
+  });
 
   overlay.classList.add("open");
 }
