@@ -80,6 +80,8 @@
   .sheet{width:100%;max-width:440px;background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 28px;transform:translateY(24px);transition:transform .2s ease;max-height:82vh;overflow-y:auto;}
   .overlay.open .sheet{transform:translateY(0);}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;}
+  .sheet-head-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .sheet-back{width:30px;height:30px;border-radius:50%;background:var(--row-bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);flex-shrink:0;font-size:15px;}
   .sheet-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
   .sheet-close{width:30px;height:30px;border-radius:50%;background:var(--row-bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;}
   .sheet-body{margin-top:16px;}
@@ -133,9 +135,12 @@
 <div class="overlay" id="overlay">
   <div class="sheet">
     <div class="sheet-head">
-      <div>
-        <div class="sheet-title" id="sheetTitle">Document</div>
-        <div class="sheet-sub" id="sheetSub"></div>
+      <div class="sheet-head-left">
+        <button class="sheet-back" id="sheetBack" aria-label="Back" style="display:none;">←</button>
+        <div>
+          <div class="sheet-title" id="sheetTitle">Document</div>
+          <div class="sheet-sub" id="sheetSub"></div>
+        </div>
       </div>
       <button class="sheet-close" id="sheetClose" aria-label="Close">✕</button>
     </div>
@@ -315,9 +320,15 @@ const sheetTitle = document.getElementById("sheetTitle");
 const sheetSub = document.getElementById("sheetSub");
 const sheetBody = document.getElementById("sheetBody");
 
-function openDoc(title, sub, url){
+const sheetBack = document.getElementById("sheetBack");
+let sheetBackHandler = null;
+
+function openDoc(title, sub, url, onBack){
   sheetTitle.textContent = title;
   sheetSub.textContent = sub || "";
+
+  sheetBackHandler = onBack || null;
+  sheetBack.style.display = onBack ? "flex" : "none";
 
   if(url){
     if(isDriveLink(url)){
@@ -342,10 +353,13 @@ function openDoc(title, sub, url){
 
 // Tapping a vehicle opens a menu of its three document tiles (title only,
 // no value) — tapping one of THOSE previews that specific document, reusing
-// the same openDoc() viewer used for passport/visa/license/permit.
+// the same openDoc() viewer used for passport/visa/license/permit, with a
+// back button that returns here.
 function openVehicleMenu(v){
   sheetTitle.textContent = v.plate;
   sheetSub.textContent = "";
+  sheetBackHandler = null;
+  sheetBack.style.display = "none";
 
   const fields = [
     { label:"Annual Fee", url:v.annualFeeUrl },
@@ -363,12 +377,13 @@ function openVehicleMenu(v){
   }</div>`;
 
   Array.from(sheetBody.querySelectorAll(".doc-cell")).forEach((el, i)=>{
-    el.addEventListener("click", ()=> openDoc(fields[i].label, "", fields[i].url));
+    el.addEventListener("click", ()=> openDoc(fields[i].label, "", fields[i].url, ()=> openVehicleMenu(v)));
   });
 
   overlay.classList.add("open");
 }
 
+sheetBack.addEventListener("click", ()=>{ if(sheetBackHandler) sheetBackHandler(); });
 document.getElementById("sheetClose").addEventListener("click", ()=> overlay.classList.remove("open"));
 overlay.addEventListener("click", (e)=>{ if(e.target === overlay) overlay.classList.remove("open"); });
 
